@@ -1,0 +1,47 @@
+services:
+  postgres:
+    image: postgres:15.2
+    container_name: db
+    environment:
+      - POSTGRES_PASSWORD=postgrespass
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_DB=backend-db
+    volumes:
+      - backend:/home/teamm/data/backend
+
+  #add service with right environment
+  multifidelity-serv:
+    image: thomasfarineau/backend:latest
+    container_name: server
+    environment:
+      - POSTGRES_HOST=postgres:5432
+    depends_on:
+      - bank-system
+      - postgres
+      - parking-system
+
+  multifidelity-cli:
+    image: thomasfarineau/cli:latest
+    container_name: cli
+    environment:
+      - SERVER_HOST=multifidelity-serv:8080
+    depends_on:
+      - multifidelity-serv
+    volumes:
+      - ./cli/scenario.txt:/app/cli/scenario.txt
+      - ./cli/scenario2.txt:/app/cli/scenario2.txt
+      - ./cli/virementLoyaltyDemo.txt:/app/cli/virementLoyaltyDemo.txt
+      - ./cli/parking.txt:/app/cli/parking.txt
+    stdin_open: true
+    tty: true
+
+  bank-system:
+    image: thomasfarineau/bank:latest
+    container_name: bank
+
+  parking-system:
+    image: thomasfarineau/parking:latest
+    container_name: parking
+
+volumes:
+  backend:

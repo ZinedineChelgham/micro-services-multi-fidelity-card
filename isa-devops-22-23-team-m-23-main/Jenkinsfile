@@ -1,0 +1,93 @@
+pipeline {
+  agent any
+  tools {
+    jdk 'jdk-19'
+    maven 'maven-3.6.3'
+    dockerTool 'docker'
+  }
+  stages {
+    stage('Init') {
+        steps {
+            sh '''
+                java --version
+                mvn --version
+            '''
+        }
+    }
+    stage('Init Docker') {
+        when {
+            branch 'main'
+        }
+        steps {
+            sh "docker --version"
+            sh "docker login --username thomasfarineau --password CtNGM9JoYKF?d#93"
+        }
+    }
+    stage('Check Backend') {
+        steps {
+            sh "cd backend && mvn verify"
+        }
+    }
+    stage('Check Cli') {
+        steps {
+            sh "cd cli && mvn package"
+        }
+    }
+    stage('Deploy Snapshot') {
+        when {
+            branch 'dev'
+        }
+        steps {
+            withMaven(
+                globalMavenSettingsConfig: 'f853fe5e-3ec4-43d6-b0e6-ca168e70e01a',
+            )
+            {
+                sh "cd backend && mvn deploy"
+                sh "cd cli && mvn deploy"
+            }
+        }
+    }
+    stage('Deploy Release') {
+        when {
+            branch 'main'
+        }
+        steps {
+            withMaven(
+                    globalMavenSettingsConfig: 'f853fe5e-3ec4-43d6-b0e6-ca168e70e01a',
+            )
+            {
+                sh "cd backend && mvn deploy"
+                sh "cd cli && mvn deploy"
+            }
+        }
+    }
+    stage('Download Artifacts') {
+        when {
+            branch 'main'
+        }
+        steps {
+            // download the last version of the backend
+            sh 'sh ./download-latest.sh'
+        }
+    }
+    stage('Create Docker Images') {
+        when {
+            branch 'main'
+        }
+        steps {
+            sh "cd backend && docker build -t thomasfarineau/backend . && docker push thomasfarineau/backend"
+            sh "cd cli && docker build -t thomasfarineau/cli . && docker push thomasfarineau/cli"
+            sh "cd bank && docker build -t thomasfarineau/bank . && docker push thomasfarineau/bank"
+            sh "cd parking && docker build -t thomasfarineau/parking . && docker push thomasfarineau/parking"
+            sh "cd backend && rm backend.jar"
+            sh "cd cli && rm cli.jar"
+        }
+    }
+    stage('Clean') {
+        steps {
+            sh "cd backend && mvn clean"
+            sh "cd cli && mvn clean"
+        }
+    }
+  }
+}

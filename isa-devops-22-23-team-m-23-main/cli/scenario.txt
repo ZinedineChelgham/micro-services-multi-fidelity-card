@@ -1,0 +1,17 @@
+register_merchant aymane aymane@gmail.com aymane123 Nice 9-5 store
+
+merchant_add_offer 1 cafe DescriptionExample 1
+merchant_add_offer 1 cafe2 DescriptionExample2 2
+merchant_add_offer 1 cafe3 DescriptionExample2 3
+
+get_catalog_by_merchant aymane
+
+update_offer 1 cafe2 DescriptionExampleUpdated 15
+delete_offer 1 cafe3
+
+offers
+
+
+register_merchant aymane2 aymane2@gmail.com aymane123 Nice 9-5 store2
+merchant_add_offer 6 offerExample DescriptionExample 10
+delete_offer 6 cafe

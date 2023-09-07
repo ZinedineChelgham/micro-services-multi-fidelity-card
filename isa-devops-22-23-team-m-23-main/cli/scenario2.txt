@@ -1,0 +1,8 @@
+register jojo jo@gmail.com mdpjojo "61, rue de biot, 06600, Biot, France" "1896983890128966, 12/22, 123"
+scan_earn 8 10 06 04 2023
+pay_gift cafe 8
+scan_earn 8 15 06 04 2023
+pay_gift cafe 8
+scan_earn 8 15 07 04 2023
+customers2
+

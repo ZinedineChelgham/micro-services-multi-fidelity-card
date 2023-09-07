@@ -1,0 +1,4 @@
+transfer-to-loyalty-card jojo 50
+get-customer-balance jojo
+multifidelity_pay 8 20 08 05 2023
+customers2
